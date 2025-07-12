@@ -11,26 +11,33 @@ st.caption("Long-term investment signal based on CAGR and dividend yield")
 ticker = "EMBASSY.NS"
 df = yf.download(ticker, start="2019-01-01")
 
-# Error handling
-if df.empty or "Adj Close" not in df.columns:
-    st.error("❌ Failed to fetch 'Adj Close' data for EMBASSY.NS. Please try again later or check ticker symbol.")
+# Choose 'Adj Close' if available, else fallback to 'Close'
+price_col = None
+if "Adj Close" in df.columns:
+    price_col = "Adj Close"
+elif "Close" in df.columns:
+    price_col = "Close"
+
+# Stop if no usable price column
+if df.empty or price_col is None:
+    st.error("❌ Failed to fetch usable price data for EMBASSY.NS. Try again later or check ticker.")
     st.stop()
 
 df.dropna(inplace=True)
 
 # Calculate CAGR
 years = len(df) / 252
-start_price = df["Adj Close"].iloc[0]
-end_price = df["Adj Close"].iloc[-1]
+start_price = df[price_col].iloc[0]
+end_price = df[price_col].iloc[-1]
 cagr = (end_price / start_price) ** (1 / years) - 1
 
 # Estimate dividend yield (approx)
-dividends = df["Adj Close"].pct_change().rolling(252).mean() * 100
+dividends = df[price_col].pct_change().rolling(252).mean() * 100
 avg_yield = dividends.iloc[-1] if not dividends.isna().all() else 0
 
 # Display price chart
 st.subheader("📈 Price Chart (All-Time)")
-st.line_chart(df["Adj Close"])
+st.line_chart(df[price_col])
 
 # Key metrics
 st.subheader("📊 Investment Metrics")
