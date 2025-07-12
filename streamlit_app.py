@@ -33,7 +33,10 @@ cagr = (end_price / start_price) ** (1 / years) - 1
 
 # Estimate dividend yield (approx)
 dividends = df[price_col].pct_change().rolling(252).mean() * 100
-avg_yield = dividends.iloc[-1] if not dividends.isna().all() else 0
+if dividends.isna().all():
+    avg_yield = 0
+else:
+    avg_yield = dividends.dropna().iloc[-1]
 
 # Display price chart
 st.subheader("📈 Price Chart (All-Time)")
