@@ -8,7 +8,7 @@ st.title("📊 Embassy Office Parks REIT Investment AI")
 st.caption("Long-term investment signal based on CAGR and dividend yield")
 
 # --- Fetch Data ---
-ticker = "TCS.NS"
+ticker = "HDFCBANK.NS"
 df = yf.download(ticker, start="2019-01-01")
 
 # --- Choose Price Column ---
